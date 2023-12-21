@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DataConnect Template Automator</title>
+    </head>
+    <body>
+        <h1>Data Connect Template Automator</h1>
+        <p>
+            This website is used to produce a 384 well template for the Data Connect website. 
+            It takes in a csv file with the samples laid out in a 96 well format.
+        </p>
+        <form id = "select-files" enctype="multipart/form-data">
+            <label for = "96-well-csv">Select your 96-Well csv template file</label>
+            <input id = "96-well-csv"type = "file" required accept=".csv">
+            <button type = "submit">Submit</button>
+        </form>
+        <script src = "script.js" async defer></script>
+    </body>
+</html>
