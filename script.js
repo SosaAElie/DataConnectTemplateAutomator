@@ -1,6 +1,6 @@
 /**
  * @typedef {Object} Well - creates a new type named 'Well'
- * @property {Array<Number>} wellNumbers - The number of the well according the 384 well plate
+ * @property {Number} well - The number of the well according the 384 well plate
  * @property {String} wellPosition - The well position i.e A1, B2, C3, etc
  * @property {String} sampleName - a number property of SpecialType
  * @property {String} sampleColor - a number property of SpecialType
@@ -18,6 +18,7 @@
  * @property {Array<String>} well384Positions - an optional number property of SpecialType with default
  * @property {Array<String>} targets - an optional number property of SpecialType with default
  * @property {Array<String>} reporters - an optional number property of SpecialType with default
+ * @property {Array<Number>} wellNumbers 
  * @property {Function} get384WellArray - an optional number property of SpecialType with default
  */
 
@@ -30,8 +31,8 @@ function main(){
         parseTemplateFile(fileInput).then(parsedCsv=>{
             const template = get96WellTemplate(parsedCsv);
             const wells = convertToWells(template);
-            wells.forEach(mutateTriplets)
-            console.log(wells)
+            mutateTriplets(wells[0])
+            console.log(wells[0].get384WellArray())
         })
     })
 }
@@ -66,7 +67,7 @@ function wellFactory(well, sampleName, position96Well, targetsAndReporters){
     const targets = Object.keys(targetsAndReporters).map(x=>x);
     const reporters = Object.values(targetsAndReporters).map(x=>x);
     return {
-        "wellNumbers":[],
+        "well":0,
         "wellPosition":"",
         "sampleName":sampleName,
         "sampleColor":"",
@@ -84,12 +85,14 @@ function wellFactory(well, sampleName, position96Well, targetsAndReporters){
         "well384Positions":[],
         "targets":targets,
         "reporters":reporters,
+        "wellNumbers":[],
         get384WellArray(){
             const data = [];
             for(let j = 0; j < this["well384Positions"].length; j++){
                 this["wellPosition"] = this["well384Positions"][j];
                 for(let i = 0; i < this.targets.length;i++){
                     const values = Object.values(this).slice(0,13);
+                    values[0] = this.wellNumbers[j];
                     values[6] = this.targets[i];
                     values[9] = this.reporters[i];
                     data.push(values);
@@ -138,10 +141,10 @@ function mutateTriplets(well){
     
     letters.push(initial384Row, initial384Row, end384Row);
     numbers.push(startCol, endCol, startCol);
-
+    
     for(let i = 0; i < letters.length; i++){
         well.well384Positions.push(`${letters[i]}${numbers[i]}`);
-        well.wellNumbers.push((offset+1)*numbers[i]); //The well number at 384 well plate
+        well.wellNumbers.push(((letters[i].charCodeAt(0)-A)*24)+numbers[i]); //The well number at 384 well plate
     }
 
     return;
