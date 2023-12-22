@@ -8,9 +8,3 @@ E,Sample-iSpecimen 7,Sample-iSpecimen 7,Sample-iSpecimen 15,Sample-iSpecimen 15,
 F,Sample-iSpecimen 8,Sample-iSpecimen 8,Sample-iSpecimen 16,Sample-iSpecimen 16,Sample-iSpecimen 24,Sample-iSpecimen 24,Sample-iSpecimen 32,Sample-iSpecimen 32,Sample-iSpecimen 40,Sample-iSpecimen 40,Standard-0.0016ug/mL,Standard-0.0016ug/mL
 G,Sample-iSpecimen 9,Sample-iSpecimen 9,Sample-iSpecimen 17,Sample-iSpecimen 17,Sample-iSpecimen 25,Sample-iSpecimen 25,Sample-iSpecimen 33,Sample-iSpecimen 33,Sample-iSpecimen 41,Sample-iSpecimen 41,Control-IgG Depleted Serum,Control-IgG Depleted Serum
 H,Sample-iSpecimen 10,Sample-iSpecimen 10,Sample-iSpecimen 18,Sample-iSpecimen 18,Sample-iSpecimen 26,Sample-iSpecimen 26,Sample-iSpecimen 34,Sample-iSpecimen 34,Sample-iSpecimen 42,Sample-iSpecimen 42,Control-IgG1 Kappa Isotype,Control-IgG1 Kappa Isotype
-,,,,,,,,,,,,
-"KEY: Please Prefix all items in the plate with any of the below prefixes, using a dash ""-"" to separate the prefix from the rest of the name",,,,,,,,,,,,
-None,No sample is in the well,,,,,,,,,,,
-Sample,Refers to any sample on the plate that is not a standard or a control,,,,,,,,,,,
-Standard,Refers to the standard used for regression analysis,,,,,,,,,,,
-Control,Refers to the positive or negative control on the plate,,,,,,,,,,,

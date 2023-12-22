@@ -29,16 +29,22 @@ function main(){
     fileSubmitForm.addEventListener("submit", event =>{
         event.preventDefault();
         const fileInput = event.target[0].files[0];
+        const replicates = event.target[1].value;
+
+        const newFileName = fileInput.name.replace(".csv", "-384Well.csv");
         parseTemplateFile(fileInput).then(parsedCsv=>{
-            const results = [["[Sample Setup]"]];
+            const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
             const template = get96WellTemplate(parsedCsv);
             const wells = convertToWells(template);
-            wells.forEach(mutateTriplets);
+            switch (replicates){
+                case "triplicates":
+                    wells.forEach(mutateTriplicates);
+                default:
+                    console.log("Error, no replicate function available for selected replicates")
+            }
             wells.forEach(well=>results.push(...well.get384WellArray()))
-            results.sort((a,b)=>a.well - b.well)
-            console.log(results)
-            //const fileUrl = URL.createObjectURL(new File(Papa.unparse(results)));
-            console.log(Papa.unparse(results))
+            const fileUrl = URL.createObjectURL(new File([Papa.unparse(results)], newFileName));
+            addLink(fileUrl, downloadContainer, newFileName)
         })
     })
 }
@@ -117,10 +123,17 @@ function convertToWells(template){
     let wellNumber = 0;
     const wells = [];
     const wellColumn = 65; //Ascii value for 'A'
+    const targetsReporters = { //Grabbed from test 384 template
+        "CT/UP":"VIC",
+        "IC":"ROX",
+        "MG/TV":"QUASAR 705",
+        "NG/TP":"FAM",
+        "UU/MH":"CY5"
+    }
     for(let row = 0; row < template.length;row++){
         for(let column = 0; column < template[row].length;column++){
             let wellPosition = String.fromCharCode(wellColumn+row);
-            wells.push(wellFactory(++wellNumber,template[row][column], `${wellPosition}${column+1}`, {CT:"RP"}))
+            wells.push(wellFactory(++wellNumber,template[row][column], `${wellPosition}${column+1}`, targetsReporters))
         }
     }
     return wells;
@@ -130,7 +143,7 @@ function convertToWells(template){
  *  @param {Well} well
  *  @returns {void}
 **/
-function mutateTriplets(well){
+function mutateTriplicates(well){
     //Pushes to the 384WellPositions property the corresponding well positions for triplicates in the 384 well template
     const rowLetter = well.well96Position[0];
     const columnNumber = Number(well.well96Position.slice(1));
@@ -146,7 +159,7 @@ function mutateTriplets(well){
     const startCol = endCol-1;
     
     letters.push(initial384Row, initial384Row, end384Row);
-    numbers.push(startCol, endCol, startCol);
+    numbers.push(startCol, endCol, endCol);
     
     for(let i = 0; i < letters.length; i++){
         well.well384Positions.push(`${letters[i]}${numbers[i]}`);
@@ -156,5 +169,18 @@ function mutateTriplets(well){
     return;
 }
 
+/** 
+ * @param {URL} link 
+ * @param {Element} parent
+ * @param {String} fileName
+ * @returns {void}
+**/
+function addLink(link, parent, fileName){
+    const anchorElement = document.createElement("a");
+    anchorElement.href = link;
+    anchorElement.download = fileName;
+    anchorElement.text = fileName;
+    parent.appendChild(anchorElement);
+}
 
 main()

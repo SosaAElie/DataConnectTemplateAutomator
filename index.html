@@ -6,9 +6,22 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <title>DataConnect Template Automator</title>
         <style>
+            #select-files{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 25px;
+            }
             #download-container{
                 display: flex;
                 flex-direction: column;
+    
+                justify-content: center;
+            }
+            #targets-reporters{
+                display: grid;
+                grid-template-columns: auto auto;
             }
         </style>
     </head>
@@ -18,9 +31,18 @@
             This website is used to produce a 384 well template for the Data Connect website. 
             It takes in a csv file with the samples laid out in a 96 well format.
         </p>
+        <a href="/Tests/96WellTemplate.csv" download="96WellTemplate.csv">Here is a template that you can modify and then upload with your modifications</a>
         <form id = "select-files" enctype="multipart/form-data">
             <label for = "96-well-csv">Select your 96-Well csv template file</label>
             <input id = "96-well-csv"type = "file" required accept=".csv">
+            <label for = "replicate-select">Select the number of replicates</label>
+            <select name = "replicates" id ="replicate-select">
+                <option value = "triplicates">Triplicates</option>
+            </select>
+            <div id = "targets-reporters">
+                <label for = "target1">Target 1</label>
+                <input id = "target1" type = "text">
+            </div>
             <button type = "submit">Submit</button>
         </form>
         <div id = "download-container"></div>
