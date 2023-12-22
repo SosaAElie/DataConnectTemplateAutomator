@@ -25,14 +25,20 @@
 
 function main(){
     const fileSubmitForm = document.getElementById("select-files");
+    const downloadContainer = document.getElementById("download-container");
     fileSubmitForm.addEventListener("submit", event =>{
         event.preventDefault();
         const fileInput = event.target[0].files[0];
         parseTemplateFile(fileInput).then(parsedCsv=>{
+            const results = [["[Sample Setup]"]];
             const template = get96WellTemplate(parsedCsv);
             const wells = convertToWells(template);
-            mutateTriplets(wells[0])
-            console.log(wells[0].get384WellArray())
+            wells.forEach(mutateTriplets);
+            wells.forEach(well=>results.push(...well.get384WellArray()))
+            results.sort((a,b)=>a.well - b.well)
+            console.log(results)
+            //const fileUrl = URL.createObjectURL(new File(Papa.unparse(results)));
+            console.log(Papa.unparse(results))
         })
     })
 }
