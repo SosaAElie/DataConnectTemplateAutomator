@@ -36,9 +36,12 @@ function main(){
             const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
             const template = get96WellTemplate(parsedCsv);
             const wells = convertToWells(template);
+            console.log(replicates)
             switch (replicates){
                 case "triplicates":
-                    wells.forEach(mutateTriplicates);
+                    const emptyWells = wells.map(mutateTriplicates);
+                    wells.push(...emptyWells);
+                    console.log(wells)
                 default:
                     console.log("Error, no replicate function available for selected replicates")
             }
@@ -141,10 +144,11 @@ function convertToWells(template){
 
 /** 
  *  @param {Well} well
- *  @returns {void}
+ *  @returns {Array<Well>}
 **/
 function mutateTriplicates(well){
     //Pushes to the 384WellPositions property the corresponding well positions for triplicates in the 384 well template
+    //Returns an empty well in the position of the bottom-left
     const rowLetter = well.well96Position[0];
     const columnNumber = Number(well.well96Position.slice(1));
     const letters = [];
@@ -165,8 +169,7 @@ function mutateTriplicates(well){
         well.well384Positions.push(`${letters[i]}${numbers[i]}`);
         well.wellNumbers.push(((letters[i].charCodeAt(0)-A)*24)+numbers[i]); //The well number at 384 well plate
     }
-
-    return;
+    return createEmptyWell(`${end384Row}${startCol}`, well.targets, well.reporters)
 }
 
 /** 
@@ -181,6 +184,50 @@ function addLink(link, parent, fileName){
     anchorElement.download = fileName;
     anchorElement.text = fileName;
     parent.appendChild(anchorElement);
+}
+
+/** 
+ * @param {String} position 
+ * @param {Well} parent
+ * @returns {Well}
+**/
+function createEmptyWell(position, targets, reporters){
+    const emptyWell = {
+        "well":0,
+        "wellPosition":"",
+        "sampleName":"EMPTY",
+        "sampleColor":'"""RGB(255,255,255)"""',
+        "biogroupName":"",
+        "biogroupColor":"",
+        "targetName":"",
+        "targetColor":"",
+        "task":"",
+        "reporter":"",
+        "quencher":"",
+        "quantity":"",
+        "comments":"",
+        "well96Number":0,
+        "well96Position":"A0",
+        "well384Positions":[position],
+        "targets":targets,
+        "reporters":reporters,
+        "wellNumbers":[],
+        get384WellArray(){
+            const data = [];
+            for(let j = 0; j < this["well384Positions"].length; j++){
+                this["wellPosition"] = this["well384Positions"][j];
+                for(let i = 0; i < this.targets.length;i++){
+                    const values = Object.values(this).slice(0,13);
+                    values[0] = this.wellNumbers[j];
+                    values[6] = this.targets[i];
+                    values[9] = this.reporters[i];
+                    data.push(values);
+                }
+            }
+            return data;
+        }
+    }
+    return emptyWell;
 }
 
 main()
