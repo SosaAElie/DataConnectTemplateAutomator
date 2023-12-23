@@ -26,16 +26,18 @@
 function main(){
     const fileSubmitForm = document.getElementById("select-files");
     const downloadContainer = document.getElementById("download-container");
+    const diagramContainer = document.getElementById("Well96-diagram");
     fileSubmitForm.addEventListener("submit", event =>{
         event.preventDefault();
         const fileInput = event.target[0].files[0];
-        const replicates = event.target[1].value.toString();
+        const replicates = event.target[1].value.toString();    
 
         const newFileName = fileInput.name.replace(".csv", "-384Well.csv");
         parseTemplateFile(fileInput).then(parsedCsv=>{
             const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
             const template = get96WellTemplate(parsedCsv);
             const wells = convertToWells(template);
+            diagram96Well(wells, diagramContainer);
             let emptyWells = [];
             switch (replicates){
                 case "triplicates":
@@ -263,6 +265,23 @@ function createEmptyWell(position, targets, reporters){
         }
     }
     return emptyWell;
+}
+
+
+/** 
+ * @param {Array<Well>} wells
+ * @param {Element} parent
+ * @returns {void}
+**/
+function diagram96Well(wells, parent){
+    for(let well of wells){
+        let circularDiv = document.createElement("div");
+        let pElement = document.createElement("p");
+        pElement.textContent = well.sampleName
+        circularDiv.className = "well";
+        circularDiv.appendChild(pElement);
+        parent.appendChild(circularDiv);
+    }
 }
 
 main()
