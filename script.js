@@ -29,19 +29,23 @@ function main(){
     fileSubmitForm.addEventListener("submit", event =>{
         event.preventDefault();
         const fileInput = event.target[0].files[0];
-        const replicates = event.target[1].value;
+        const replicates = event.target[1].value.toString();
 
         const newFileName = fileInput.name.replace(".csv", "-384Well.csv");
         parseTemplateFile(fileInput).then(parsedCsv=>{
             const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
             const template = get96WellTemplate(parsedCsv);
             const wells = convertToWells(template);
-            console.log(replicates)
+            let emptyWells = [];
             switch (replicates){
                 case "triplicates":
-                    const emptyWells = wells.map(mutateTriplicates);
+                    emptyWells = wells.map(mutateTriplicates);
                     wells.push(...emptyWells);
-                    console.log(wells)
+                    break;
+                case "duplicates":
+                    wells.forEach(well=>emptyWells.push(...mutateDuplicates(well)));
+                    wells.push(...emptyWells);
+                    break;
                 default:
                     console.log("Error, no replicate function available for selected replicates")
             }
@@ -144,7 +148,7 @@ function convertToWells(template){
 
 /** 
  *  @param {Well} well
- *  @returns {Array<Well>}
+ *  @returns {Well}
 **/
 function mutateTriplicates(well){
     //Pushes to the 384WellPositions property the corresponding well positions for triplicates in the 384 well template
@@ -171,6 +175,37 @@ function mutateTriplicates(well){
     }
     return createEmptyWell(`${end384Row}${startCol}`, well.targets, well.reporters)
 }
+
+/** 
+ *  @param {Well} well
+ *  @returns {Well}
+**/
+function mutateDuplicates(well){
+    //Pushes to the 384WellPositions property the corresponding well positions for triplicates in the 384 well template
+    //Returns an empty well in the position of the bottom-left
+    const rowLetter = well.well96Position[0];
+    const columnNumber = Number(well.well96Position.slice(1));
+    const letters = [];
+    const numbers = [];
+    const A = 65; //Ascii value of 'A'
+    const rowAscii = rowLetter.charCodeAt(0)
+    const offset = rowAscii-A;
+    const initial384Row = String.fromCharCode(rowAscii+offset);
+    const end384Row = String.fromCharCode(rowAscii+offset+1);
+    
+    const endCol = columnNumber*2;
+    const startCol = endCol-1;
+    
+    letters.push(initial384Row, initial384Row);
+    numbers.push(startCol, endCol);
+    
+    for(let i = 0; i < letters.length; i++){
+        well.well384Positions.push(`${letters[i]}${numbers[i]}`);
+        well.wellNumbers.push(((letters[i].charCodeAt(0)-A)*24)+numbers[i]); //The well number at 384 well plate
+    }
+    return [createEmptyWell(`${end384Row}${startCol}`, well.targets, well.reporters), createEmptyWell(`${end384Row}${endCol}`, well.targets, well.reporters)]
+}
+
 
 /** 
  * @param {URL} link 
