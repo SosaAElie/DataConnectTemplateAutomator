@@ -27,18 +27,17 @@ function main(){
     const fileSubmitForm = document.getElementById("select-files");
     const downloadContainer = document.getElementById("download-container");
     const diagramContainer = document.getElementById("Well96-diagram");
+    const make384TemplateButton = document.getElementById("make384Template");
+    let fileCount = 0;
     fileSubmitForm.addEventListener("submit", event =>{
         event.preventDefault();
         const fileInput = event.target[0].files[0];
         const replicates = event.target[1].value.toString();    
-
-        const newFileName = fileInput.name.replace(".csv", "-384Well.csv");
+        let emptyWells = [];
         parseTemplateFile(fileInput).then(parsedCsv=>{
-            const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
             const template = get96WellTemplate(parsedCsv);
             const wells = convertToWells(template);
             diagram96Well(wells, diagramContainer);
-            let emptyWells = [];
             switch (replicates){
                 case "triplicates":
                     emptyWells = wells.map(mutateTriplicates);
@@ -51,12 +50,21 @@ function main(){
                 default:
                     console.log("Error, no replicate function available for selected replicates")
             }
-            wells.forEach(well=>results.push(...well.get384WellArray()))
-            const fileUrl = URL.createObjectURL(new File([Papa.unparse(results)], newFileName));
-            addLink(fileUrl, downloadContainer, newFileName)
+            make384TemplateButton.addEventListener("click", event => {
+                const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
+                const newFileName = fileInput.name.replace(".csv", `-384WellFileNumber${++fileCount}.csv`);
+                wells.forEach(well=>results.push(...well.get384WellArray()))
+                const fileUrl = URL.createObjectURL(new File([Papa.unparse(results)], newFileName));
+                addLink(fileUrl, downloadContainer, newFileName)
+            })
+            
         })
     })
 }
+
+
+
+
 /** 
 *  @param {File} file
 *  @returns {Promise<String>}
@@ -275,11 +283,28 @@ function createEmptyWell(position, targets, reporters){
 **/
 function diagram96Well(wells, parent){
     for(let well of wells){
-        let circularDiv = document.createElement("div");
-        let pElement = document.createElement("p");
-        pElement.textContent = well.sampleName
+        const circularDiv = document.createElement("div");
+        const hoverText = document.createElement("span");
+        hoverText.textContent = well.sampleName;
+        hoverText.className = "hovertext"
         circularDiv.className = "well";
-        circularDiv.appendChild(pElement);
+        circularDiv.addEventListener("click", function (event){
+            this.firstChild.style.visibility = "hidden";
+            const sampleNameInput = document.createElement("input");
+            this.appendChild(sampleNameInput);
+            sampleNameInput.style.zIndex = "1";
+            this.lastChild.focus();
+            
+            sampleNameInput.addEventListener("change", event=>{
+                
+                this.firstChild.style.visibility = "";
+                well.sampleName = sampleNameInput.value;
+                hoverText.textContent = sampleNameInput.value;
+                this.removeChild(sampleNameInput);
+            })
+            
+        })
+        circularDiv.appendChild(hoverText);
         parent.appendChild(circularDiv);
     }
 }
