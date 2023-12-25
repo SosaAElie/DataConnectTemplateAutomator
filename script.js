@@ -1,25 +1,25 @@
 /**
  * @typedef {Object} Well - creates a new type named 'Well'
  * @property {Number} well - The number of the well according the 384 well plate
- * @property {String} wellPosition - The well position i.e A1, B2, C3, etc
- * @property {String} sampleName - a number property of SpecialType
- * @property {String} sampleColor - a number property of SpecialType
- * @property {String} biogroupName - a number property of SpecialType
- * @property {String} biogroupColor - a number property of SpecialType
- * @property {String} targetName - a number property of SpecialType
- * @property {String} targetColor - a number property of SpecialType
- * @property {String} task - an optional number property of SpecialType
- * @property {String} reporter - an optional number property of SpecialType
- * @property {String} quencher - an optional number property of SpecialType with default
- * @property {String} quantity - an optional number property of SpecialType with default
- * @property {String} comments - an optional number property of SpecialType with default
- * @property {Number} well96Number - an optional number property of SpecialType with default
- * @property {String} well96Position - an optional number property of SpecialType with default
- * @property {Array<String>} well384Positions - an optional number property of SpecialType with default
- * @property {Array<String>} targets - an optional number property of SpecialType with default
- * @property {Array<String>} reporters - an optional number property of SpecialType with default
- * @property {Array<Number>} wellNumbers 
- * @property {Function} get384WellArray - an optional number property of SpecialType with default
+ * @property {String} wellPosition - The well position i.e A1, B2, C3, etc in the 384 Well Plate
+ * @property {String} sampleName - The sample name
+ * @property {String} sampleColor - The sample color that is shown in the DataConnect website
+ * @property {String} biogroupName - Not sure, probably something that relates to a property on the DataConnect Website
+ * @property {String} biogroupColor - Not sure, probably something that relates to a property on the DataConnect Website
+ * @property {String} targetName - The name of the target, i.e the name of the gene/DNA sequence aimed to be replicated
+ * @property {String} targetColor - The color assigned to the target shown on the DataConnect website
+ * @property {String} task - Not sure, probably something that relates to a property on the DataConnect Website
+ * @property {String} reporter - The flourophore molecule that emits the specified wavelength when it's bond to the probe is cleaved by Taq Polymerase
+ * @property {String} quencher - The molecule that absorbs the emitted wavelength by the flourophore and prevents its wavelength from being read by the QuantStudio
+ * @property {String} quantity - Not sure, probably something that relates to a property on the DataConnect Website
+ * @property {String} comments - Not sure, probably something that relates to a property on the DataConnect Website
+ * @property {Number} well96Number - The number of the well on the 96 well plate going from left to right i.e well in A1 is 1, A2 is 2, B1 is 13, B2 is 14, etc
+ * @property {String} well96Position - The position of the sample in the 96 well plate, A1, A2, A3, etc
+ * @property {Array<String>} well384Positions - The positions the sample is in, in the 384 well template relative to its position in the 96 well template and whether its in duplicates or triplicates
+ * @property {Array<String>} targets - The name of the targets, i.e the name of the gene/DNA sequence aimed to be replicated
+ * @property {Array<String>} reporters - The flourophore molecules that emit the specified wavelength when it's bond to the probe is cleaved by Taq Polymerase
+ * @property {Array<Number>} wellNumbers - The well number of the sample in the 384 well template
+ * @property {Function} get384WellArray - A function that provides the properties in an array that can then be used by the Papa.unparse method to create a string which can be written to the csv file
  */
 
 
@@ -38,7 +38,7 @@ function main(){
             const template = get96WellTemplate(parsedCsv);
             const wells = convertToWells(template);
             diagram96Well(wells, diagramContainer);
-            switch (replicates){
+            switch (replicates){ //Make it so that empty wells can be redone if the user selects and submits duplicates and then later decides to do it in triplicates
                 case "triplicates":
                     emptyWells = wells.map(mutateTriplicates);
                     wells.push(...emptyWells);
@@ -284,10 +284,14 @@ function createEmptyWell(position, targets, reporters){
 function diagram96Well(wells, parent){
     for(let well of wells){
         const circularDiv = document.createElement("div");
+        const wellPosition = document.createElement("p");
+        wellPosition.textContent = well.well96Position;
         const hoverText = document.createElement("span");
         hoverText.textContent = well.sampleName;
         hoverText.className = "hovertext"
         circularDiv.className = "well";
+        circularDiv.appendChild(hoverText);
+        circularDiv.appendChild(wellPosition)
         circularDiv.addEventListener("click", function (event){
             this.firstChild.style.visibility = "hidden";
             const sampleNameInput = document.createElement("input");
@@ -302,9 +306,14 @@ function diagram96Well(wells, parent){
                 hoverText.textContent = sampleNameInput.value;
                 this.removeChild(sampleNameInput);
             })
+
+            sampleNameInput.addEventListener("focusout", event=>{
+                this.removeChild(sampleNameInput);
+                this.firstChild.style.visibility = "";                
+            })
             
         })
-        circularDiv.appendChild(hoverText);
+        
         parent.appendChild(circularDiv);
     }
 }
