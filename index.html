@@ -4,73 +4,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link rel="stylesheet" type="text/css" href="style.css" /> 
         <title>DataConnect Template Automator</title>
-        <style>
-            body{
-                background-color: rgba(255, 228, 196, 0.316);
-            }
-            #select-files{
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 25px;
-            }
-            #download-container{
-                display: flex;
-                flex-direction: column;
-    
-                justify-content: center;
-            }
-            #targets-reporters{
-                display: grid;
-                grid-template-columns: auto auto;
-            }
-            #Well96-diagram{
-                display: grid;
-                grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto;
-                grid-template-rows: auto auto auto auto auto auto auto auto;
-                gap: 1%;     
-            }
-            #Well96-diagram>div{
-                height: 50px;
-                width: 50px;
-                border-style: solid;
-                border-color: black;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-            }
-            .well{ 
-                font-weight: bolder;
-            }
-            .well .hovertext{
-                visibility: hidden;
-                width: 120px;
-                background-color: black;
-                color: #fff;
-                text-align: center;
-                border-radius: 6px;
-                padding: 5px 0;
-
-
-                /* Position the tooltip */
-                position: absolute;
-                z-index: 1;
-            }
-            .well:hover .hovertext {
-                visibility: visible;
-            }
-            
-        </style>
     </head>
     <body>
-        <h1>Data Connect Template Automator</h1>
-        <p>
-            This website is used to produce a 384 well template for the Data Connect website. 
-            It takes in a csv file with the samples laid out in a 96 well format.
-        </p>
-        <a href="96WellTemplate.csv" download="96WellTemplate.csv">Here is a template that you can modify and then upload with your modifications</a>
+        <h1 id = "title">96 Well Template Visualizer</h1>
+        <p>This website is used to produce a 384 well template for the Data Connect website. </p>
+        <a href="96WellTemplate.csv" download="96WellTemplate.csv">Click me to download a template that you can modify and then upload with your modifications</a>
         <form id = "select-files" enctype="multipart/form-data">
             <label for = "96-well-csv">Select your 96-Well csv template file</label>
             <input id = "96-well-csv"type = "file" required accept=".csv">
@@ -83,11 +23,11 @@
                 <label for = "target1">Target 1</label>
                 <input id = "target1" type = "text">
             </div>
-            <button type = "submit">Visualize</button>
-            <button id = "make384Template"type = "button">Make 384 Well Template</button>
+            <button type = "submit">Submit</button>
         </form>
         
         <div id = "download-container"></div>
+        <h2>96 Well Template</h2>
         <div id = "Well96-diagram"></div>
         <script src = "script.js" async defer></script>
     </body>

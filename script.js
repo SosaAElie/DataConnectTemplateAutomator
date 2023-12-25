@@ -28,16 +28,26 @@ function main(){
     const downloadContainer = document.getElementById("download-container");
     const diagramContainer = document.getElementById("Well96-diagram");
     const make384TemplateButton = document.getElementById("make384Template");
+    const fileInput = document.getElementById("96-well-csv");
+    let wells;
     let fileCount = 0;
+
+
+    fileInput.addEventListener("change",event=>{
+        event.preventDefault();
+        const fileInput = event.target.files[0];  
+        parseTemplateFile(fileInput)
+            .then(parsedCsv=>{
+                const template = get96WellTemplate(parsedCsv);
+                wells = convertToWells(template);
+                diagram96Well(wells, diagramContainer);
+            })
+    })
+
     fileSubmitForm.addEventListener("submit", event =>{
         event.preventDefault();
-        const fileInput = event.target[0].files[0];
-        const replicates = event.target[1].value.toString();    
+        const replicates = event.target[1].value;    
         let emptyWells = [];
-        parseTemplateFile(fileInput).then(parsedCsv=>{
-            const template = get96WellTemplate(parsedCsv);
-            const wells = convertToWells(template);
-            diagram96Well(wells, diagramContainer);
             switch (replicates){ //Make it so that empty wells can be redone if the user selects and submits duplicates and then later decides to do it in triplicates
                 case "triplicates":
                     emptyWells = wells.map(mutateTriplicates);
@@ -57,8 +67,6 @@ function main(){
                 const fileUrl = URL.createObjectURL(new File([Papa.unparse(results)], newFileName));
                 addLink(fileUrl, downloadContainer, newFileName)
             })
-            
-        })
     })
 }
 
@@ -292,8 +300,10 @@ function diagram96Well(wells, parent){
         circularDiv.className = "well";
         circularDiv.appendChild(hoverText);
         circularDiv.appendChild(wellPosition)
+
         circularDiv.addEventListener("click", function (event){
             this.firstChild.style.visibility = "hidden";
+            this.firstChild.nextSibling.style.visibility = "hidden"; 
             const sampleNameInput = document.createElement("input");
             this.appendChild(sampleNameInput);
             sampleNameInput.style.zIndex = "1";
@@ -301,15 +311,17 @@ function diagram96Well(wells, parent){
             
             sampleNameInput.addEventListener("change", event=>{
                 
-                this.firstChild.style.visibility = "";
                 well.sampleName = sampleNameInput.value;
                 hoverText.textContent = sampleNameInput.value;
                 this.removeChild(sampleNameInput);
+                this.firstChild.style.visibility = "";
+                this.firstChild.nextSibling.style.visibility = ""; 
             })
 
             sampleNameInput.addEventListener("focusout", event=>{
                 this.removeChild(sampleNameInput);
-                this.firstChild.style.visibility = "";                
+                this.firstChild.style.visibility = "";             
+                this.firstChild.nextSibling.style.visibility = "";  
             })
             
         })

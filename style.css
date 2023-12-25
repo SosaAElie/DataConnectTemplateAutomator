@@ -1,0 +1,72 @@
+body{
+    display: flex;
+    flex-direction: column;
+    background-color: #F3EEEA;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    text-align: center;
+    align-items: center;
+    font-size: larger;
+}
+button{
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+}
+input{
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+}
+#select-files{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+#download-container{
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+}
+#targets-reporters{
+    display: grid;
+    grid-template-columns: auto auto;
+}
+#Well96-diagram{
+    display: grid;
+    grid-template-columns: repeat(12, auto);
+    gap: 1%;
+    width: fit-content;
+    padding-bottom: 2%;
+}
+#Well96-diagram>div{
+    height: 50px;
+    width: 50px;
+    border-style: solid;
+    border-color: black;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+}
+
+.well{ 
+    font-weight: bolder;
+    justify-content: center;
+}
+.well .hovertext{
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    font-size: medium;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+.well:hover .hovertext {
+    visibility: visible;
+}
