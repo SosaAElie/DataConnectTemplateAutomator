@@ -8,6 +8,26 @@ body{
     align-items: center;
     font-size: larger;
 }
+#targets{
+    display: flex;
+    flex-direction: column;
+    row-gap: 3px;
+}
+#reporters{
+    display: flex;
+    flex-direction: column;
+    row-gap: 3px;
+}
+#targets-reporters{
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 10%;
+}
+#button-container{
+    position: relative;
+    left: 60%;
+    padding-top: 10%;
+}
 button{
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
@@ -53,6 +73,7 @@ input{
 .well{ 
     font-weight: bolder;
     justify-content: center;
+    background-color: #DADDB1;
 }
 .well .hovertext{
     visibility: hidden;

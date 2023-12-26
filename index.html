@@ -9,7 +9,7 @@
     </head>
     <body>
         <h1 id = "title">96 Well Template Visualizer</h1>
-        <p>This website is used to produce a 384 well template for the Data Connect website. </p>
+        <p>This website is used to produce a 384 well template for the Thermofisher DataConnect website. </p>
         <a href="96WellTemplate.csv" download="96WellTemplate.csv">Click me to download a template that you can modify and then upload with your modifications</a>
         <form id = "select-files" enctype="multipart/form-data">
             <label for = "96-well-csv">Select your 96-Well csv template file</label>
@@ -20,14 +20,27 @@
                 <option value = "duplicates">Duplicates</option>
             </select>
             <div id = "targets-reporters">
-                <label for = "target1">Target 1</label>
-                <input id = "target1" type = "text">
+                <div id = "targets">
+                    <h2>Target</h2>
+                    <input type = "text" class = "target">
+                </div>
+                <div id = "reporters">
+                    <h2>Reporter</h2>
+                    <input type = "text" class = "reporter">
+                </div>
+                <div id = "button-container">
+                    <button type = "button" id = "add">Add</button>
+                    <button type = "button" id = "remove">Remove</button>
+                </div>
+                
             </div>
             <button type = "submit">Submit</button>
         </form>
-        
-        <div id = "download-container"></div>
-        <h2>96 Well Template</h2>
+        <br/>
+        <div id = "download-container">
+            <h2>384 Well Template Files</h2>
+        </div>
+        <h2>96 Well Diagram</h2>
         <div id = "Well96-diagram"></div>
         <script src = "script.js" async defer></script>
     </body>

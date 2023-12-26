@@ -20,6 +20,7 @@
  * @property {Array<String>} reporters - The flourophore molecules that emit the specified wavelength when it's bond to the probe is cleaved by Taq Polymerase
  * @property {Array<Number>} wellNumbers - The well number of the sample in the 384 well template
  * @property {Function} get384WellArray - A function that provides the properties in an array that can then be used by the Papa.unparse method to create a string which can be written to the csv file
+ * @property {Function} getLessShallowCopy - A function that retuns a 1 layer deep copy of the object itself
  */
 
 
@@ -27,59 +28,71 @@ function main(){
     const fileSubmitForm = document.getElementById("select-files");
     const downloadContainer = document.getElementById("download-container");
     const diagramContainer = document.getElementById("Well96-diagram");
-    const make384TemplateButton = document.getElementById("make384Template");
     const fileInput = document.getElementById("96-well-csv");
-    let wells;
+    document.getElementById("add").addEventListener("click", addTargetReporterInput);
+    document.getElementById("remove").addEventListener("click", removeTargetReporterInput);
+    let stableWells;
     let fileCount = 0;
+    let selectedFile;
 
 
     fileInput.addEventListener("change",event=>{
         event.preventDefault();
-        const fileInput = event.target.files[0];  
-        parseTemplateFile(fileInput)
+        selectedFile = event.target.files[0];  
+        parseTemplateFile(selectedFile)
             .then(parsedCsv=>{
                 const template = get96WellTemplate(parsedCsv);
-                wells = convertToWells(template);
-                diagram96Well(wells, diagramContainer);
+                stableWells = convertToWells(template);
+                const currentNumChildren = diagramContainer.children.length;
+                if(currentNumChildren > 0){
+                    for(let i = 0; i < currentNumChildren; i++) diagramContainer.removeChild(diagramContainer.firstChild);
+                }
+                diagram96Well(stableWells, diagramContainer)
             })
+            .catch(err => console.log(err));
     })
 
     fileSubmitForm.addEventListener("submit", event =>{
         event.preventDefault();
         const replicates = event.target[1].value;    
+        const wells = stableWells.map(well => well.getLessShallowCopy())
+        
+        const targets = Array.from(document.getElementsByClassName("target")).map(input=>input.value);
+        const reporters = Array.from(document.getElementsByClassName("reporter")).map(input=>input.value);
+
+        wells.forEach(well => {
+            well.targets = targets;
+            well.reporters = reporters;
+        })
+        
         let emptyWells = [];
-            switch (replicates){ //Make it so that empty wells can be redone if the user selects and submits duplicates and then later decides to do it in triplicates
-                case "triplicates":
-                    emptyWells = wells.map(mutateTriplicates);
-                    wells.push(...emptyWells);
-                    break;
-                case "duplicates":
-                    wells.forEach(well=>emptyWells.push(...mutateDuplicates(well)));
-                    wells.push(...emptyWells);
-                    break;
-                default:
-                    console.log("Error, no replicate function available for selected replicates")
-            }
-            make384TemplateButton.addEventListener("click", event => {
-                const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
-                const newFileName = fileInput.name.replace(".csv", `-384WellFileNumber${++fileCount}.csv`);
-                wells.forEach(well=>results.push(...well.get384WellArray()))
-                const fileUrl = URL.createObjectURL(new File([Papa.unparse(results)], newFileName));
-                addLink(fileUrl, downloadContainer, newFileName)
-            })
+        switch (replicates){ //Make it so that empty wells can be redone if the user selects and submits duplicates and then later decides to do it in triplicates
+            case "triplicates":
+                emptyWells = wells.map(mutateTriplicates);
+                wells.push(...emptyWells);
+                break;
+            case "duplicates":
+                wells.forEach(well=>emptyWells.push(...mutateDuplicates(well)));
+                wells.push(...emptyWells);
+                break;
+            default:
+                console.log("Error, no replicate function available for selected replicates")
+        }
+        const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
+        const newFileName = selectedFile.name.replace(".csv", `-384WellTemplate-${replicates}-${++fileCount}.csv`);
+        wells.forEach(well=>results.push(...well.get384WellArray()))
+        const fileUrl = URL.createObjectURL(new File([Papa.unparse(results)], newFileName));
+        addLink(fileUrl, downloadContainer, newFileName)
     })
 }
-
-
-
-
 /** 
 *  @param {File} file
 *  @returns {Promise<String>}
 **/
 function parseTemplateFile(file){
     return new Promise((resolve, reject)=>{
-        Papa.parse(file, {complete:resolve})
+        Papa.parse(file, {complete:resolve, error:reject})
+        
     })
 }
 /** 
@@ -97,12 +110,13 @@ function get96WellTemplate(results, file){
  *  @param {Number} well
  *  @param {String} sampleName
  *  @param {String} position96Well
- *  @param {Object} targetsAndReporters
+ *  @param {Array<String>} targets
+ *  @param {Array<String>} reporters
  *  @returns {Well}
 **/
-function wellFactory(well, sampleName, position96Well, targetsAndReporters){
-    const targets = Object.keys(targetsAndReporters).map(x=>x);
-    const reporters = Object.values(targetsAndReporters).map(x=>x);
+function wellFactory(well, sampleName, position96Well, targets, reporters){
+    // const targets = Object.keys(targetsAndReporters).map(x=>x);
+    // const reporters = Object.values(targetsAndReporters).map(x=>x);
     return {
         "well":0,
         "wellPosition":"",
@@ -136,29 +150,37 @@ function wellFactory(well, sampleName, position96Well, targetsAndReporters){
                 }
             }
             return data;
-        }
+        },
+        getLessShallowCopy(){
+            const lessShallowCopy = {};
+            for(let [key, val] of Object.entries(this)){
+                if(Array.isArray(val)){
+                    let arrayCopy = val.map(x=>x);
+                    lessShallowCopy[key] = arrayCopy
+                }
+                else{
+                    lessShallowCopy[key] = val;
+                }
+            }
+            return lessShallowCopy
+        },
     }
 }
 
 /** 
  *  @param {Array<Array<String>>} template
+ *  @param {Array<String>} targets
+ *  @param {Array<String>} reporters
  *  @returns {Array<Well>}
 **/
 function convertToWells(template){
     let wellNumber = 0;
     const wells = [];
     const wellColumn = 65; //Ascii value for 'A'
-    const targetsReporters = { //Grabbed from test 384 template
-        "CT/UP":"VIC",
-        "IC":"ROX",
-        "MG/TV":"QUASAR 705",
-        "NG/TP":"FAM",
-        "UU/MH":"CY5"
-    }
     for(let row = 0; row < template.length;row++){
         for(let column = 0; column < template[row].length;column++){
             let wellPosition = String.fromCharCode(wellColumn+row);
-            wells.push(wellFactory(++wellNumber,template[row][column], `${wellPosition}${column+1}`, targetsReporters))
+            wells.push(wellFactory(++wellNumber,template[row][column], `${wellPosition}${column+1}`, [], []))
         }
     }
     return wells;
@@ -235,7 +257,7 @@ function addLink(link, parent, fileName){
     const anchorElement = document.createElement("a");
     anchorElement.href = link;
     anchorElement.download = fileName;
-    anchorElement.text = fileName;
+    anchorElement.textContent = fileName;
     parent.appendChild(anchorElement);
 }
 
@@ -278,7 +300,20 @@ function createEmptyWell(position, targets, reporters){
                 }
             }
             return data;
-        }
+        },
+        getLessShallowCopy(){
+            const lessShallowCopy = {};
+            for(let [key, val] of Object.entries(this)){
+                if(Array.isArray(val)){
+                    let arrayCopy = val.map(x=>x);
+                    lessShallowCopy[key] = arrayCopy
+                }
+                else{
+                    lessShallowCopy[key] = val;
+                }
+            }
+            return lessShallowCopy
+        },
     }
     return emptyWell;
 }
@@ -313,6 +348,7 @@ function diagram96Well(wells, parent){
                 
                 well.sampleName = sampleNameInput.value;
                 hoverText.textContent = sampleNameInput.value;
+                
                 this.removeChild(sampleNameInput);
                 this.firstChild.style.visibility = "";
                 this.firstChild.nextSibling.style.visibility = ""; 
@@ -327,6 +363,35 @@ function diagram96Well(wells, parent){
         })
         
         parent.appendChild(circularDiv);
+    }
+}
+
+/** 
+ * @param {Event} event
+ * @returns {void}
+**/
+function addTargetReporterInput(event){
+    event.preventDefault();
+    const targetInput = document.createElement("input");
+    const reporterInput = document.createElement("input");
+    targetInput.className = "target";
+    reporterInput.className = "reporter";
+    document.getElementById("reporters").appendChild(reporterInput);
+    document.getElementById("targets").appendChild(targetInput);
+}
+
+/** 
+ * @param {Event} event
+ * @returns {void}
+**/
+function removeTargetReporterInput(event){
+    event.preventDefault();
+    
+    const reporters = document.getElementById("reporters");
+    const targets = document.getElementById("targets");
+    if (reporters.children.length > 2 && targets.children.length > 2){
+        reporters.removeChild(reporters.lastChild);
+        targets.removeChild(targets.lastChild);
     }
 }
 
