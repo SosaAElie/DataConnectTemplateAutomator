@@ -8,6 +8,26 @@ body{
     align-items: center;
     font-size: larger;
 }
+#instructions{
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    text-align: left;
+    position: relative;
+}
+body>p{
+    margin: 5px;
+}
+
+#instructions>h2{
+    text-align: center;
+    margin: 0px;    
+}
+ol>li{
+    position: relative;
+    left: 15%;
+}
+
 #targets{
     display: flex;
     flex-direction: column;

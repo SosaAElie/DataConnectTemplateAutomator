@@ -10,15 +10,30 @@
     <body>
         <h1 id = "title">96 Well Template Visualizer</h1>
         <p>This website is used to produce a 384 well template for the Thermofisher DataConnect website. </p>
-        <a href="96WellTemplate.csv" download="96WellTemplate.csv">Click me to download a template that you can modify and then upload with your modifications</a>
+        <div id = "instructions">
+            <h2>Instructions</h2>
+            <ol>
+                <li>Download <a href="96WellTemplate.csv" download="96WellTemplate.csv">96 Well Template</a></li>
+                <li>Make your edits to your 96 Well Template</li>
+                <li>Upload edited 96 Well Template</li>
+                <li>Select Duplicates or Triplicates for your 384 Template</li>
+                <li>Enter your Targets and Reporters</li>
+                <li>Submit your Specifications</li>
+                <li>Download your 384 Well Template</li>
+            </ol>
+        </div>
         <form id = "select-files" enctype="multipart/form-data">
-            <label for = "96-well-csv">Select your 96-Well csv template file</label>
-            <input id = "96-well-csv"type = "file" required accept=".csv">
-            <label for = "replicate-select">Select the number of replicates</label>
-            <select name = "replicates" id ="replicate-select">
-                <option value = "triplicates">Triplicates</option>
-                <option value = "duplicates">Duplicates</option>
-            </select>
+            <div>
+                <label for = "96-well-csv">Upload Your Edited 96 Well Template</label>
+                <input id = "96-well-csv" type = "file" required accept=".csv">
+            </div>
+            <div>
+                <label for = "replicate-select">Select Replicates:</label>
+                <select name = "replicates" id ="replicate-select">
+                    <option value = "triplicates">Triplicates</option>
+                    <option value = "duplicates">Duplicates</option>
+                </select>
+            </div>
             <div id = "targets-reporters">
                 <div id = "targets">
                     <h2>Target</h2>
@@ -38,9 +53,11 @@
         </form>
         <br/>
         <div id = "download-container">
-            <h2>384 Well Template Files</h2>
+            <h2>Download Your 384 Well Template Files</h2>
         </div>
         <h2>96 Well Diagram</h2>
+        <p>Make sure to click submit after making any changes to the diagram below</p>
+        <p>to get an updated 384 Well Template File</p>
         <div id = "Well96-diagram"></div>
         <script src = "script.js" async defer></script>
     </body>

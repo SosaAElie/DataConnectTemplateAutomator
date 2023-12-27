@@ -117,11 +117,12 @@ function get96WellTemplate(results, file){
 function wellFactory(well, sampleName, position96Well, targets, reporters){
     // const targets = Object.keys(targetsAndReporters).map(x=>x);
     // const reporters = Object.values(targetsAndReporters).map(x=>x);
+
     return {
         "well":0,
         "wellPosition":"",
         "sampleName":sampleName,
-        "sampleColor":"",
+        "sampleColor":sampleName.toUpperCase() === "EMPTY"?'"""RGB(255,255,255)"""':"",
         "biogroupName":"",
         "biogroupColor":"",
         "targetName":"",
@@ -347,6 +348,7 @@ function diagram96Well(wells, parent){
             sampleNameInput.addEventListener("change", event=>{
                 
                 well.sampleName = sampleNameInput.value;
+                well.sampleColor = sampleNameInput.value.toUpperCase() === "EMPTY"?'"""RGB(255,255,255)"""':"";
                 hoverText.textContent = sampleNameInput.value;
                 
                 this.removeChild(sampleNameInput);
