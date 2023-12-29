@@ -89,7 +89,25 @@ input{
     display: flex;
     align-items: center;
 }
-
+#Well384-diagram{
+    display: grid;
+    grid-template-columns: repeat(24, auto);
+    gap: 1%;
+    width: fit-content;
+    padding-bottom: 10%;
+    padding-top: 2%;
+    align-self:flex-start;
+    
+}
+#Well384-diagram>div{
+    height: 40px;
+    width: 40px;
+    border-style: solid;
+    border-color: black;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+}
 .well{ 
     font-weight: bolder;
     justify-content: center;
@@ -98,7 +116,7 @@ input{
 .well .hovertext{
     visibility: hidden;
     width: 120px;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.585);
     color: #fff;
     text-align: center;
     border-radius: 6px;

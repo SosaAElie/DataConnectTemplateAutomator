@@ -29,6 +29,7 @@ function main(){
     const downloadContainer = document.getElementById("download-container");
     const diagramContainer = document.getElementById("Well96-diagram");
     const fileInput = document.getElementById("96-well-csv");
+    const diagram384Container = document.getElementById("Well384-diagram");
     document.getElementById("add").addEventListener("click", addTargetReporterInput);
     document.getElementById("remove").addEventListener("click", removeTargetReporterInput);
     let stableWells;
@@ -56,7 +57,6 @@ function main(){
         event.preventDefault();
         const replicates = event.target[1].value;    
         const wells = stableWells.map(well => well.getLessShallowCopy())
-        
         const targets = Array.from(document.getElementsByClassName("target")).map(input=>input.value);
         const reporters = Array.from(document.getElementsByClassName("reporter")).map(input=>input.value);
 
@@ -81,6 +81,8 @@ function main(){
         const results = [["[Sample Setup]"], "Well,Well Position,Sample Name,Sample Color,Biogroup Name,Biogroup Color,Target Name,Target Color,Task,Reporter,Quencher,Quantity,Comments".split(",")];
         const newFileName = selectedFile.name.replace(".csv", `-384WellTemplate-${replicates}-${++fileCount}.csv`);
         wells.forEach(well=>results.push(...well.get384WellArray()))
+        sortResultsByWellPosition(results);
+        diagram384Well(results, diagram384Container);
         const fileUrl = URL.createObjectURL(new File([Papa.unparse(results)], newFileName));
         addLink(fileUrl, downloadContainer, newFileName)
     })
@@ -269,7 +271,7 @@ function addLink(link, parent, fileName){
 **/
 function createEmptyWell(position, targets, reporters){
     const emptyWell = {
-        "well":0,
+        "well":"",
         "wellPosition":"",
         "sampleName":"EMPTY",
         "sampleColor":'"""RGB(255,255,255)"""',
@@ -282,7 +284,7 @@ function createEmptyWell(position, targets, reporters){
         "quencher":"",
         "quantity":"",
         "comments":"",
-        "well96Number":0,
+        "well96Number":"",
         "well96Position":"A0",
         "well384Positions":[position],
         "targets":targets,
@@ -294,7 +296,7 @@ function createEmptyWell(position, targets, reporters){
                 this["wellPosition"] = this["well384Positions"][j];
                 for(let i = 0; i < this.targets.length;i++){
                     const values = Object.values(this).slice(0,13);
-                    values[0] = this.wellNumbers[j];
+                    values[0] = this.wellNumbers[j]?this.wellNumbers[j]:"";
                     values[6] = this.targets[i];
                     values[9] = this.reporters[i];
                     data.push(values);
@@ -332,6 +334,7 @@ function diagram96Well(wells, parent){
         wellPosition.textContent = well.well96Position;
         const hoverText = document.createElement("span");
         hoverText.textContent = well.sampleName;
+        circularDiv.style.backgroundColor = well.sampleName.toUpperCase()==="EMPTY"?"white":"";
         hoverText.className = "hovertext"
         circularDiv.className = "well";
         circularDiv.appendChild(hoverText);
@@ -351,19 +354,51 @@ function diagram96Well(wells, parent){
                 well.sampleColor = sampleNameInput.value.toUpperCase() === "EMPTY"?'"""RGB(255,255,255)"""':"";
                 hoverText.textContent = sampleNameInput.value;
                 
-                this.removeChild(sampleNameInput);
+                
                 this.firstChild.style.visibility = "";
                 this.firstChild.nextSibling.style.visibility = ""; 
+                console.log(this)
+                this.style.backgroundColor = sampleNameInput.value.toUpperCase() === "EMPTY"?"white":"";
+                try {
+                    this.removeChild(this.lastChild);
+                } catch (error) {
+                    ""
+                }
+                
             })
 
             sampleNameInput.addEventListener("focusout", event=>{
-                this.removeChild(sampleNameInput);
+                this.removeChild(this.lastChild);
                 this.firstChild.style.visibility = "";             
                 this.firstChild.nextSibling.style.visibility = "";  
+                
             })
             
         })
         
+        parent.appendChild(circularDiv);
+    }
+}
+
+/** 
+ * @param {Array<Array<String>>} results
+ * @param {Element} parent
+ * @returns {void}
+**/
+function diagram384Well(results, parent){
+    while (parent.children.length !== 0) parent.removeChild(parent.firstChild);
+    for (let i = 2; i < results.length; i++){
+        
+        const circularDiv = document.createElement("div");
+        const wellPosition = document.createElement("p");
+        wellPosition.textContent = results[i][1];
+        const hoverText = document.createElement("span");
+        hoverText.textContent = results[i][2];
+        circularDiv.style.backgroundColor = results[i][2].toUpperCase()==="EMPTY"?"white":"";
+        hoverText.className = "hovertext"
+        circularDiv.className = "well";
+        circularDiv.appendChild(hoverText);
+        circularDiv.appendChild(wellPosition);
         parent.appendChild(circularDiv);
     }
 }
@@ -395,6 +430,22 @@ function removeTargetReporterInput(event){
         reporters.removeChild(reporters.lastChild);
         targets.removeChild(targets.lastChild);
     }
+}
+
+/** 
+ * @param {Array<Array<String>>} results
+ * @returns {void}
+**/
+function sortResultsByWellPosition(results){
+    //Sorts array of strings in place by order A1, A2, A3,...A24, B1, B2, B3, etc
+    return results.sort((well1, well2)=>{
+        if(well1.length < 13 || well2.length < 13) return 0;
+        if(well1[1] === "Well Position" || well2[1] === "Well Position") return 0;
+        if(well1[1].charCodeAt(0) - well2[1].charCodeAt(0) === 0){
+            return parseInt(well1[1].slice(1)) - parseInt(well2[1].slice(1));
+        }
+        return well1[1].charCodeAt(0) - well2[1].charCodeAt(0);
+    })
 }
 
 main()
