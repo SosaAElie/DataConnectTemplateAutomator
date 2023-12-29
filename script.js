@@ -336,7 +336,7 @@ function diagram96Well(wells, parent){
         circularDiv.className = "well";
         circularDiv.appendChild(hoverText);
         circularDiv.appendChild(wellPosition)
-
+        circularDiv.style.backgroundColor = well.sampleName.toUpperCase()==="EMPTY"?"white":"";
         circularDiv.addEventListener("click", function (event){
             this.firstChild.style.visibility = "hidden";
             this.firstChild.nextSibling.style.visibility = "hidden"; 
@@ -349,15 +349,20 @@ function diagram96Well(wells, parent){
                 
                 well.sampleName = sampleNameInput.value;
                 well.sampleColor = sampleNameInput.value.toUpperCase() === "EMPTY"?'"""RGB(255,255,255)"""':"";
+                this.style.backgroundColor = sampleNameInput.value.toUpperCase()==="EMPTY"?"white":"";
                 hoverText.textContent = sampleNameInput.value;
+                try {
+                    this.removeChild(this.lastChild);
+                } catch (error) {
+                    console.log("The focus out event has already removed the input element")
+                }
                 
-                this.removeChild(sampleNameInput);
                 this.firstChild.style.visibility = "";
                 this.firstChild.nextSibling.style.visibility = ""; 
             })
 
             sampleNameInput.addEventListener("focusout", event=>{
-                this.removeChild(sampleNameInput);
+                this.removeChild(this.lastChild);
                 this.firstChild.style.visibility = "";             
                 this.firstChild.nextSibling.style.visibility = "";  
             })
