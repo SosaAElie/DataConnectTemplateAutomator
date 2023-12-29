@@ -42,6 +42,7 @@ ol>li{
     display: grid;
     grid-template-columns: auto auto;
     column-gap: 10%;
+    
 }
 #button-container{
     position: relative;
@@ -96,6 +97,7 @@ input{
     width: fit-content;
     padding-bottom: 10%;
     padding-top: 2%;
+    padding-left: 2%;
     align-self:flex-start;
     
 }
