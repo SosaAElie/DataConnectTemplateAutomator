@@ -66,19 +66,18 @@ input{
 #download-container{
     display: flex;
     flex-direction: column;
-
     justify-content: center;
 }
 #targets-reporters{
     display: grid;
     grid-template-columns: auto auto;
-}
+}˙
 #Well96-diagram{
     display: grid;
     grid-template-columns: repeat(12, auto);
     gap: 1%;
-    width: fit-content;
-    padding-bottom: 2%;
+    width:50%;
+    padding-bottom: 2rem;
 }
 #Well96-diagram>div{
     height: 50px;
@@ -93,10 +92,9 @@ input{
     display: grid;
     grid-template-columns: repeat(24, auto);
     gap: 1%;
-    width: fit-content;
     padding-bottom: 10%;
     padding-top: 2%;
-    align-self:flex-start;
+    width: 75%;
     
 }
 #Well384-diagram>div{
