@@ -268,54 +268,8 @@ function addLink(link, parent, fileName){
  * @returns {Well}
 **/
 function createEmptyWell(position, targets, reporters){
-    const emptyWell = {
-        "well":0,
-        "wellPosition":"",
-        "sampleName":"EMPTY",
-        "sampleColor":'"""RGB(255,255,255)"""',
-        "biogroupName":"",
-        "biogroupColor":"",
-        "targetName":"",
-        "targetColor":"",
-        "task":"",
-        "reporter":"",
-        "quencher":"",
-        "quantity":"",
-        "comments":"",
-        "well96Number":0,
-        "well96Position":"A0",
-        "well384Positions":[position],
-        "targets":targets,
-        "reporters":reporters,
-        "wellNumbers":[],
-        get384WellArray(){
-            const data = [];
-            for(let j = 0; j < this["well384Positions"].length; j++){
-                this["wellPosition"] = this["well384Positions"][j];
-                for(let i = 0; i < this.targets.length;i++){
-                    const values = Object.values(this).slice(0,13);
-                    values[0] = this.wellNumbers[j];
-                    values[6] = this.targets[i];
-                    values[9] = this.reporters[i];
-                    data.push(values);
-                }
-            }
-            return data;
-        },
-        getLessShallowCopy(){
-            const lessShallowCopy = {};
-            for(let [key, val] of Object.entries(this)){
-                if(Array.isArray(val)){
-                    let arrayCopy = val.map(x=>x);
-                    lessShallowCopy[key] = arrayCopy
-                }
-                else{
-                    lessShallowCopy[key] = val;
-                }
-            }
-            return lessShallowCopy
-        },
-    }
+    const emptyWell = wellFactory(0, "EMPTY", "A0", targets, reporters);
+    emptyWell.well384Positions = [position];
     return emptyWell;
 }
 
