@@ -72,7 +72,7 @@ input{
 #targets-reporters{
     display: grid;
     grid-template-columns: auto auto;
-}˙
+}
 #Well96-diagram{
     display: grid;
     grid-template-columns: repeat(12, auto);
