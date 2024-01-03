@@ -59,7 +59,10 @@ function main(){
         
         const targets = Array.from(document.getElementsByClassName("target")).map(input=>input.value);
         const reporters = Array.from(document.getElementsByClassName("reporter")).map(input=>input.value);
-
+        const [tar, rep] = chosenSet(document.getElementById("target-set").value);
+        tar.forEach(t => targets.push(t));
+        rep.forEach(r => reporters.push(r));
+        
         wells.forEach(well => {
             well.targets = targets;
             well.reporters = reporters;
@@ -85,6 +88,26 @@ function main(){
         addLink(fileUrl, downloadContainer, newFileName)
     })
 }
+
+/** 
+*  @param {String} set A single character representing the target reporter set
+*  @returns {Array<Array<String>, Array<String>>} Returns an array containing the targets and reporters in that order
+**/
+function chosenSet(set){
+    if(set === "A"){
+        return [["NG", "CT", "UU", "MG", "IC"], ["FAM", "HEX", "Cy5", "QUASAR75", "ROX"]];
+    }
+    else if(set === "B"){
+        return [["TP", "UP", "MH", "TV", "IC"], ["FAM", "HEX", "Cy5", "QUASAR75", "ROX"]];
+    }
+    else if(set === "C"){
+        return [["CA", "GV", "HSV1", "HSV2", "IC"], ["FAM", "HEX", "Cy5", "QUASAR75", "ROX"]];
+    }
+    else {
+        return [[],[]];
+    }
+}
+
 /** 
 *  @param {File} file
 *  @returns {Promise<String>}
