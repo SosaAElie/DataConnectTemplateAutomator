@@ -95,13 +95,13 @@ function main(){
 **/
 function chosenSet(set){
     if(set === "A"){
-        return [["NG", "CT", "UU", "MG", "IC"], ["FAM", "HEX", "Cy5", "QUASAR75", "ROX"]];
+        return [["NG", "CT", "UU", "MG", "IC"], ["FAM", "VIC", "CY5", "QUASAR 75", "ROX"]];
     }
     else if(set === "B"){
-        return [["TP", "UP", "MH", "TV", "IC"], ["FAM", "HEX", "Cy5", "QUASAR75", "ROX"]];
+        return [["TP", "UP", "MH", "TV", "IC"], ["FAM", "VIC", "CY5", "QUASAR 75", "ROX"]];
     }
     else if(set === "C"){
-        return [["CA", "GV", "HSV1", "HSV2", "IC"], ["FAM", "HEX", "Cy5", "QUASAR75", "ROX"]];
+        return [["CA", "GV", "HSV1", "HSV2", "IC"], ["FAM", "VIC", "CY5", "QUASAR 75", "ROX"]];
     }
     else {
         return [[],[]];
