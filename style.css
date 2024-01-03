@@ -92,10 +92,12 @@ input{
 #Well384-diagram{
     display: grid;
     grid-template-columns: repeat(24, auto);
-    gap: 1%;
+    /* gap: 1%; */
     padding-bottom: 10%;
     padding-top: 2%;
     width: 75%;
+    align-self: flex-start;
+    margin-left: 8rem;
     
 }
 #Well384-diagram>div{
