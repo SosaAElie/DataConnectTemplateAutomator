@@ -94,14 +94,27 @@ function main(){
 *  @returns {Array<Array<String>, Array<String>>} Returns an array containing the targets and reporters in that order
 **/
 function chosenSet(set){
+    const reporters = ["FAM", "VIC", "CY5", "QUASAR 705", "ROX"];
     if(set === "A"){
-        return [["NG", "CT", "UU", "MG", "IC"], ["FAM", "VIC", "CY5", "QUASAR 705", "ROX"]];
+        return [["NG", "CT", "UU", "MG", "IC"], reporters];
     }
     else if(set === "B"){
-        return [["TP", "UP", "MH", "TV", "IC"], ["FAM", "VIC", "CY5", "QUASAR 705", "ROX"]];
+        return [["TP", "UP", "MH", "TV", "IC"], reporters];
     }
     else if(set === "C"){
-        return [["CA", "GV", "HSV1", "HSV2", "IC"], ["FAM", "VIC", "CY5", "QUASAR 705", "ROX"]];
+        return [["CA", "GV", "HSV1", "HSV2", "IC"], reporters];
+    }
+    else if(set == "A/B"){
+        return [["NG/TP", "CT/UP", "UU/MH", "MG/TV", "IC"], reporters];
+    }
+    else if(set == "A/C"){
+        return [["NG/CA", "CT/GV", "UU/HSV1", "MG/HSV2", "IC"], reporters];
+    }
+    else if(set == "B/C"){
+        return [["TP/CA", "UP/GV", "MH/HSV1", "TV/HSV2", "IC"], reporters];
+    }
+    else if(set == "A/B/C"){
+        return [["NG/TP/CA", "CT/UP/GV", "UU/MH/HSV1", "MG/TV/HSV2", "IC"], reporters];
     }
     else {
         return [[],[]];
