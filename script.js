@@ -94,7 +94,7 @@ function main(){
 *  @returns {Array<Array<String>, Array<String>>} Returns an array containing the targets and reporters in that order
 **/
 function chosenSet(set){
-    const reporters = ["FAM", "VIC", "CY5", "QUASAR 705", "ROX"];
+    const reporters = ["FAM", "HEX", "CY5", "QUASAR 705", "ROX"];
     if(set === "A"){
         return [["NG", "CT", "UU", "MG", "IC"], reporters];
     }
