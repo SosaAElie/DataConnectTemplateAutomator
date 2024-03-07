@@ -60,9 +60,9 @@ function main(){
         const targets = Array.from(document.getElementsByClassName("target")).map(input=>input.value);
         const reporters = Array.from(document.getElementsByClassName("reporter")).map(input=>input.value);
         const [tar, rep] = chosenSet(document.getElementById("target-set").value);
+
         tar.forEach(t => targets.push(t));
         rep.forEach(r => reporters.push(r));
-        
         wells.forEach(well => {
             well.targets = targets;
             well.reporters = reporters;
@@ -116,8 +116,11 @@ function chosenSet(set){
     else if(set == "A/B/C"){
         return [["NG/TP/CA", "CT/UP/GV", "UU/MH/HSV1", "MG/TV/HSV2", "IC"], reporters];
     }
-    else {
-        return [[],[]];
+    else if (set == "FLUSC2RSV"){
+        return [["SC2", "INFB","INFA", "RSVAB", "IC"],["FAM", "HEX", "CY5.5", "CY5", "ROX"]];
+    }
+    else{
+        return [[],[]]
     }
 }
 
