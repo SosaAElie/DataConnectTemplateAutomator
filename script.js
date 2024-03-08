@@ -54,11 +54,15 @@ function main(){
 
     fileSubmitForm.addEventListener("submit", event =>{
         event.preventDefault();
-        const replicates = event.target[1].value;    
+
         const wells = stableWells.map(well => well.getLessShallowCopy())
         
         const targets = Array.from(document.getElementsByClassName("target")).map(input=>input.value);
         const reporters = Array.from(document.getElementsByClassName("reporter")).map(input=>input.value);
+        if(targets.length + reporters.length === 2){
+            targets.pop()
+            reporters.pop()
+        }
         const [tar, rep] = chosenSet(document.getElementById("target-set").value);
 
         tar.forEach(t => targets.push(t));
@@ -67,6 +71,23 @@ function main(){
             well.targets = targets;
             well.reporters = reporters;
         })
+
+        if(event.target[1].checked){
+            for(let i = 0; i < wells[0].targets.length; i++){
+                let target = wells[0].targets[i];
+                let reporter = wells[0].reporters[i]; 
+                const newFileName = selectedFile.name.replace(".csv", `-Cfx96WellTemplate-${reporter}-${target}.csv`);
+                const results = createCfx96Template(wells, target)
+                
+                const fileUrl = URL.createObjectURL(new File([Papa.unparse(results)], newFileName));
+                addLink(fileUrl, downloadContainer, newFileName)
+            }
+            return
+        }
+        
+
+        const replicates = event.target[2].value;    
+        
         
         let emptyWells = [];
         switch (replicates){ //Make it so that empty wells can be redone if the user selects and submits duplicates and then later decides to do it in triplicates
@@ -209,8 +230,6 @@ function wellFactory(well, sampleName, position96Well, targets, reporters){
 
 /** 
  *  @param {Array<Array<String>>} template
- *  @param {Array<String>} targets
- *  @param {Array<String>} reporters
  *  @returns {Array<Well>}
 **/
 function convertToWells(template){
@@ -394,5 +413,21 @@ function removeTargetReporterInput(event){
         targets.removeChild(targets.lastChild);
     }
 }
+
+/** 
+ * @param {Array<Well>} wells
+ * @param {String} target
+ * @returns {void}
+**/
+function createCfx96Template(wells, target){
+    const results = [["Row", "Column", "*Target Name", "*Sample Name"]];
+    wells.forEach(well=>{
+        const row = well.well96Position[0];
+        const column = well.well96Position.slice(1);
+        results.push([row, column, target, well.sampleName])
+    })
+    return results
+}
+
 
 main()
