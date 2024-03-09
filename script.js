@@ -28,15 +28,22 @@ function main(){
     const fileSubmitForm = document.getElementById("select-files");
     const downloadContainer = document.getElementById("download-container");
     const diagramContainer = document.getElementById("Well96-diagram");
-    const fileInput = document.getElementById("96-well-csv");
+    const templateInput = document.getElementById("96-well-csv");
+    const cfx96ResultsInput = document.getElementById("cfx96Results");
     document.getElementById("add").addEventListener("click", addTargetReporterInput);
     document.getElementById("remove").addEventListener("click", removeTargetReporterInput);
     let stableWells;
     let fileCount = 0;
     let selectedFile;
 
+    cfx96ResultsInput.addEventListener("input", event=>{
+        const cfx96ResultsFile = event.target.files[0];
+        processCfx96Results(cfx96ResultsFile, downloadContainer);
+    })
 
-    fileInput.addEventListener("change",event=>{
+
+
+    templateInput.addEventListener("change",event=>{
         event.preventDefault();
         selectedFile = event.target.files[0];  
         parseTemplateFile(selectedFile)
@@ -72,7 +79,7 @@ function main(){
             well.reporters = reporters;
         })
 
-        if(event.target[1].checked){
+        if(event.target[2].checked){
             for(let i = 0; i < wells[0].targets.length; i++){
                 let target = wells[0].targets[i];
                 let reporter = wells[0].reporters[i]; 
@@ -86,7 +93,7 @@ function main(){
         }
         
 
-        const replicates = event.target[2].value;    
+        const replicates = event.target[3].value;    
         
         
         let emptyWells = [];
@@ -427,6 +434,73 @@ function createCfx96Template(wells, target){
         results.push([row, column, target, well.sampleName])
     })
     return results
+}
+
+
+/** 
+ * 
+ * @param {File} cfx96Results
+ * @param {HTMLElement} downloadContainer
+ * @returns {void}
+**/
+function processCfx96Results(cfx96Results, downloadContainer){
+    Papa.parse(cfx96Results, {complete:(results, file)=>{
+        const samples = new Map();
+        const csvData = results.data;
+        const start = 1;
+        const end = -1;
+        const sampleNames = csvData.slice(start,end).map(row=>row[5]);
+        const targets = csvData.slice(start,end).map(row=>row[3]);
+        const cqs = csvData.slice(start,end).map(row=>row[7]);
+        const wells = csvData.slice(start,end).map(row=>row[1]);
+        
+        if(sampleNames.length !== targets.length){
+            console.log("Error, there are more sample names than targets, the arrays are not the same size");
+            return;
+        }
+        for(let i = 0; i < sampleNames.length; i++){
+            if(samples.has(sampleNames[i])){
+                const currentSample = samples.get(sampleNames[i]);
+                if(currentSample.has(targets[i])){
+                    const targetCqs = currentSample.get(targets[i]);
+                    targetCqs.push(Number(cqs[i]));
+                }
+                else{
+                    currentSample.set(targets[i], [Number(cqs[i])]);
+                }
+                // const currentSampleWells = currentSample.get("wells");
+                // if(currentSampleWells.indexOf(wells[i]) <= -1){
+                //     currentSampleWells.push(wells[i]);
+                // }
+            }
+            else{
+                const sampleData = new Map();
+                sampleData.set(targets[i], [Number(cqs[i])]);
+                // sampleData.set("wells", [wells[i]]);
+                samples.set(sampleNames[i], sampleData);
+            }
+        }
+        const sampleTargets = Array.from(Array.from(samples.values())[0].keys());
+        const uniqueSamples = Array.from(samples.keys());
+        
+        for(let sample of uniqueSamples){
+            
+            samples.get(sample).set("averages", []);
+            for(let target of sampleTargets){
+                const average = `${ss.mean(samples.get(sample).get(target)).toFixed(2)}(${ss.sampleStandardDeviation(samples.get(sample).get(target)).toFixed(2)})`;
+                samples.get(sample).get("averages").push(average);
+            }
+        }
+        const resultFileData = [["Sample Name", ...sampleTargets]];
+        for(let sample of uniqueSamples){
+            const temp = [sample];
+            temp.push(...samples.get(sample).get("averages"))
+            resultFileData.push(temp);
+        }
+        const newFileName = file.name.replace(".csv", "-analyzed.csv");
+        const fileUrl = URL.createObjectURL(new File([Papa.unparse(resultFileData)], newFileName));
+        addLink(fileUrl, downloadContainer, newFileName)
+    }})
 }
 
 

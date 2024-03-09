@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/7.8.3/simple-statistics.min.js" integrity="sha512-20e6vQxuYnKMdwYkMA+16QfkAXLyNMtHY3ffIbQiH+GJM7Anux6j1PA6Ah2nyhB/ZNM/+wFlDulOKug7QCw2RQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <link rel="stylesheet" type="text/css" href="style.css" /> 
         <title>DataConnect Template Automator</title>
     </head>
@@ -26,6 +27,9 @@
             <div>
                 <label for = "96-well-csv">Upload Your Edited 96 Well Template</label>
                 <input id = "96-well-csv" type = "file" required accept=".csv">
+                <label for = "cfx96Results">Upload Your CFX96 Results</label>
+                <input id = "cfx96Results" type = "file"  accept=".csv">
+
             </div>
             <div>          
                 <input id = "cfx96template" type = "checkbox" name = "cfx96template">
@@ -71,7 +75,7 @@
         </form>
         <br/>
         <div id = "download-container">
-            <h2>Download Your 384 Well Template Files</h2>
+            <h2>Download Your Files</h2>
         </div>
         <h2>96 Well Diagram</h2>
         <p>Make sure to click submit after making any changes to the diagram below</p>
